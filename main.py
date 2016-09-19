@@ -1,5 +1,9 @@
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
+import natsort
+import imageio
 
 
 def create_figure(min_val, max_val):
@@ -50,7 +54,7 @@ def draw_projections(ax, x, y, a, b, c):
     return lines
 
 
-def rotate_2d():
+def rotate_2d(ims_output_folder):
 
     # Settings
     n_data_points = 20
@@ -73,7 +77,7 @@ def rotate_2d():
     center = min_val + np.round((max_val - min_val) / 2.0)
 
     line, projected_lines = None, None
-    for _ in np.arange(1, 361):
+    for degrees_rotated in np.arange(1, 361):
 
         # Rotate points
         x0, y0 = rotate_point(x=x0, y=y0, center_point=center, angle_deg=1)
@@ -92,14 +96,32 @@ def rotate_2d():
         # Draw perpendicular projections
         projected_lines = draw_projections(ax, x, y, a, b, c)
 
-        plt.draw()
-        plt.show()
+        # plt.draw()
+        # plt.show()
 
-    # plt.tight_layout()
-    # plt.savefig('rotate_2d.png', format='png',
-    #             facecolor=fig.get_facecolor(), edgecolor='none')
+        plt.tight_layout()
+        plt.savefig(
+            os.path.join(ims_output_folder, '%s%s' % (
+                str(degrees_rotated), '.png')),
+            format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+
+
+def create_gif(ims_input_folder, gif_output_name, frame_dur=0.01):
+    images = []
+    for file_name in natsort.natsorted(os.listdir(ims_input_folder)):
+        images.append(
+            imageio.imread(os.path.join(ims_input_folder, file_name)))
+    imageio.mimsave(gif_output_name, images, duration=frame_dur)
 
 
 if __name__ == '__main__':
     plt.close("all")
-    rotate_2d()
+
+    # Create output folder
+    gif_frames_output_folder = 'gif_frames_2d'
+    if not os.path.exists(gif_frames_output_folder):
+        os.makedirs(gif_frames_output_folder)
+
+    rotate_2d(ims_output_folder=gif_frames_output_folder)
+    create_gif(ims_input_folder=gif_frames_output_folder,
+               gif_output_name='rotating_projections_2d.gif')
