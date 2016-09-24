@@ -2,13 +2,11 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
-import natsort
-import imageio
 
 
 def create_figure(min_val, max_val):
     background_color = '#131919'
-    fig = plt.figure(figsize=(10, 10), facecolor=background_color)
+    fig = plt.figure(figsize=(5, 5), facecolor=background_color)
     ax = fig.add_subplot(1, 1, 1)
     ax.axis('off')
     ax.patch.set_facecolor(background_color)
@@ -60,24 +58,28 @@ def rotate_2d(ims_output_folder):
     n_data_points = 20
     min_val, max_val = 20, 80
     val_range = max_val - min_val
+    np.random.seed(123)
 
     # Create data points
     x = np.random.randint(low=min_val, high=max_val, size=n_data_points)
     y = np.random.randint(low=min_val, high=max_val, size=n_data_points)
 
+    # Create starting and ending point of the rotating line
+    extra_length = 0.1
+    x0, y0 = [min_val - extra_length * val_range] * 2
+    x1, y1 = [max_val + extra_length * val_range] * 2
+    center = min_val + np.round((max_val - min_val) / 2.0)
+
     # Create figure
-    fig, ax = create_figure(min_val, max_val)
+    fig, ax = create_figure(min_val=x0, max_val=x1)
 
     # Visualize points
     ax.scatter(x, y, color='cyan', s=50, marker='^')
 
-    # Plot line ax + by + c = 0
-    x0, y0 = [min_val - 0.1 * val_range] * 2
-    x1, y1 = [max_val + 0.1 * val_range] * 2
-    center = min_val + np.round((max_val - min_val) / 2.0)
-
     line, projected_lines = None, None
-    for degrees_rotated in np.arange(1, 361):
+    max_degrees = 361
+    max_digits = len(str(max_degrees))
+    for frame, _ in enumerate(np.arange(1, 361)):
 
         # Rotate points
         x0, y0 = rotate_point(x=x0, y=y0, center_point=center, angle_deg=1)
@@ -99,19 +101,18 @@ def rotate_2d(ims_output_folder):
         # plt.draw()
         # plt.show()
 
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(ims_output_folder, '%s%s' % (
-                str(degrees_rotated), '.png')),
-            format='png', facecolor=fig.get_facecolor(), edgecolor='none')
+        # plt.tight_layout()
+        file_name = os.path.join(ims_output_folder,
+                                 'frame_%s.png' % str(frame).zfill(max_digits))
+        plt.savefig(file_name, format='png', facecolor=fig.get_facecolor())
 
 
-def create_gif(ims_input_folder, gif_output_name, frame_dur=0.01):
-    images = []
-    for file_name in natsort.natsorted(os.listdir(ims_input_folder)):
-        images.append(
-            imageio.imread(os.path.join(ims_input_folder, file_name)))
-    imageio.mimsave(gif_output_name, images, duration=frame_dur)
+def create_gif(ims_input_folder, gif_output_name, delay=2):
+    # ImageMagick
+    os.system(("{path_to_convert} -delay {delay} "
+               "{ims_folder}/*png {gif_name}").format(
+        path_to_convert="/opt/local/bin/convert", delay=delay,
+        ims_folder=ims_input_folder, gif_name=gif_output_name))
 
 
 if __name__ == '__main__':
@@ -124,4 +125,4 @@ if __name__ == '__main__':
 
     rotate_2d(ims_output_folder=gif_frames_output_folder)
     create_gif(ims_input_folder=gif_frames_output_folder,
-               gif_output_name='rotating_projections_2d.gif')
+               gif_output_name='rotating_projections_2d.gif', delay=3)
