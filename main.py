@@ -1,4 +1,6 @@
 import os
+import subprocess
+from sys import platform as _platform
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,12 +9,10 @@ import matplotlib.pyplot as plt
 def create_figure(min_val, max_val):
     background_color = '#131919'
     fig = plt.figure(figsize=(5, 5), facecolor=background_color)
-    ax = fig.add_subplot(1, 1, 1)
+    ax = fig.add_axes([0, 0, 1, 1], frameon=False)
     ax.axis('off')
-    ax.patch.set_facecolor(background_color)
     ax.set_xlim((min_val, max_val))
     ax.set_ylim((min_val, max_val))
-    fig.tight_layout()
     return fig, ax
 
 
@@ -42,12 +42,18 @@ def get_closest_point_on_line(x, y, a, b, c):
 
 
 def draw_projections(ax, x, y, a, b, c):
-    lines = []
+    lines, coords, distances = [], [], []
     for x_point, y_point in zip(x, y):
         x_on_line, y_on_line = get_closest_point_on_line(
             x_point, y_point, a, b, c)
-        line_proj, = ax.plot([x_point, x_on_line], [y_point, y_on_line],
-                             linewidth=1, color='cyan', alpha=0.8)
+        # Calculate Euclidean distance with Pythagorean theorem
+        distances.append(np.sqrt((x_point-x_on_line)**2 +
+                                 (y_point-y_on_line)**2))
+        coords.append([[x_point, x_on_line], [y_point, y_on_line]])
+    max_distance = np.float(np.max(distances))
+    for c, d in zip(coords, distances):
+        line_proj, = ax.plot(*c, linewidth=(2-d/max_distance)**2,
+                             color='cyan', alpha=0.8)
         lines.append(line_proj)
     return lines
 
@@ -74,7 +80,7 @@ def rotate_2d(ims_output_folder):
     fig, ax = create_figure(min_val=x0, max_val=x1)
 
     # Visualize points
-    ax.scatter(x, y, color='cyan', s=50, marker='^')
+    ax.scatter(x, y, color='cyan', s=50, marker='o')
 
     line, projected_lines = None, None
     max_degrees = 361
@@ -101,18 +107,31 @@ def rotate_2d(ims_output_folder):
         # plt.draw()
         # plt.show()
 
-        # plt.tight_layout()
         file_name = os.path.join(ims_output_folder,
                                  'frame_%s.png' % str(frame).zfill(max_digits))
         plt.savefig(file_name, format='png', facecolor=fig.get_facecolor())
 
 
+def get_imagemagick_path():
+    if _platform == "linux" or _platform == "linux2":
+        # Linux
+        raise(Exception("I don't know where ImageMagick is installed :("))
+    elif _platform == "darwin":
+        # macOS (OS X)
+        return os.path.join(os.sep, "opt", "local", "bin", "convert")
+    elif _platform == "win32":
+        # Windows
+        return os.path.join('c:', os.sep, 'Program Files',
+                            'ImageMagick-7.0.3-Q16', 'convert.exe')
+
+
 def create_gif(ims_input_folder, gif_output_name, delay=2):
-    # ImageMagick
-    os.system(("{path_to_convert} -delay {delay} "
-               "{ims_folder}/*png {gif_name}").format(
-        path_to_convert="/opt/local/bin/convert", delay=delay,
-        ims_folder=ims_input_folder, gif_name=gif_output_name))
+    # Create GIF with ImageMagick
+    subprocess.call(
+        "{path_to_convert} -delay {delay} "
+        "{ims_folder}/*png {gif_name}".format(
+            path_to_convert=get_imagemagick_path(), delay=delay,
+            ims_folder=ims_input_folder, gif_name=gif_output_name))
 
 
 if __name__ == '__main__':
