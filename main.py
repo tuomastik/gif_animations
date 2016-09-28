@@ -3,7 +3,9 @@ import subprocess
 from sys import platform as _platform
 
 import numpy as np
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
+from matplotlib import colors
+from matplotlib import cm
 
 
 def create_figure(min_val, max_val):
@@ -42,7 +44,7 @@ def get_closest_point_on_line(x, y, a, b, c):
 
 
 def draw_projections(ax, x, y, a, b, c):
-    lines, coords, distances = [], [], []
+    drawn_points, coords, distances = [], [], []
     for x_point, y_point in zip(x, y):
         x_on_line, y_on_line = get_closest_point_on_line(
             x_point, y_point, a, b, c)
@@ -50,12 +52,22 @@ def draw_projections(ax, x, y, a, b, c):
         distances.append(np.sqrt((x_point-x_on_line)**2 +
                                  (y_point-y_on_line)**2))
         coords.append([[x_point, x_on_line], [y_point, y_on_line]])
-    max_distance = np.float(np.max(distances))
-    for c, d in zip(coords, distances):
-        line_proj, = ax.plot(*c, linewidth=(2-d/max_distance)**2,
-                             color='cyan', alpha=0.8)
-        lines.append(line_proj)
-    return lines
+
+    min_distance, max_distance = np.min(distances), np.float(np.max(distances))
+    # Get values for colormap
+    colormap = cm.get_cmap('YlGnBu_r')
+    norm = colors.Normalize(vmax=max_distance, vmin=min_distance)
+
+    for i, (c, d, x_point, y_point) in enumerate(zip(coords, distances, x, y)):
+        # Draw projection
+        line_proj, = ax.plot(*c, linewidth=(2.3-d/max_distance)**2,
+                             color=colormap(norm(d)), alpha=1.0, zorder=i)
+        # Draw point
+        point = ax.scatter(x_point, y_point, color=colormap(norm(d)),
+                           s=60-d/max_distance*30, marker='o', zorder=i)
+        # Append
+        drawn_points += [line_proj, point]
+    return drawn_points
 
 
 def rotate_2d(ims_output_folder):
@@ -79,10 +91,7 @@ def rotate_2d(ims_output_folder):
     # Create figure
     fig, ax = create_figure(min_val=x0, max_val=x1)
 
-    # Visualize points
-    ax.scatter(x, y, color='cyan', s=50, marker='o')
-
-    line, projected_lines = None, None
+    drawn_shapes = None
     max_degrees = 361
     max_digits = len(str(max_degrees))
     for frame, _ in enumerate(np.arange(1, 361)):
@@ -91,21 +100,19 @@ def rotate_2d(ims_output_folder):
         x0, y0 = rotate_point(x=x0, y=y0, center_point=center, angle_deg=1)
         x1, y1 = rotate_point(x=x1, y=y1, center_point=center, angle_deg=1)
 
-        if line is not None and projected_lines is not None:
-            # Remove last drawn lines if exist
-            lines = projected_lines + [line]
-            for l in lines:
-                l.remove()
+        if drawn_shapes is not None:
+            # Remove last drawn shapes if they exist
+            for s in drawn_shapes:
+                s.remove()
 
-        # Plot rotating line
-        line, = ax.plot([x0, x1], [y0, y1], linewidth=3, color='magenta')
         # Get line equation
         a, b, c = get_line_equation(x0, y0, x1, y1)
         # Draw perpendicular projections
-        projected_lines = draw_projections(ax, x, y, a, b, c)
-
-        # plt.draw()
-        # plt.show()
+        drawn_shapes = draw_projections(ax, x, y, a, b, c)
+        # Plot rotating line
+        line, = ax.plot([x0, x1], [y0, y1], linewidth=4.5, color='magenta',
+                        zorder=999)
+        drawn_shapes.append(line)
 
         file_name = os.path.join(ims_output_folder,
                                  'frame_%s.png' % str(frame).zfill(max_digits))
@@ -131,7 +138,7 @@ def create_gif(ims_input_folder, gif_output_name, delay=2):
         "{path_to_convert} -delay {delay} "
         "{ims_folder}/*png {gif_name}".format(
             path_to_convert=get_imagemagick_path(), delay=delay,
-            ims_folder=ims_input_folder, gif_name=gif_output_name))
+            ims_folder=ims_input_folder, gif_name=gif_output_name), shell=True)
 
 
 if __name__ == '__main__':
