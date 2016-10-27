@@ -1,5 +1,5 @@
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D, proj3d
 from matplotlib import pyplot as plt
 
 
@@ -19,7 +19,6 @@ class Plane:
             return np.concatenate((end_part, start_part))
 
     def calculate_coords(self, min_val, max_val):
-
         # Calculate d = -(a*x_0 + b*y_0 + c*z_0)
         self.d = (-self.point * self.normal).sum()
 
@@ -41,6 +40,39 @@ class Plane:
             [coordinate_matrix_1, coordinate_matrix_2, coordinate_matrix_3],
             times_rotated)
 
+    @staticmethod
+    def _rotate_point(x, y, z, x_rot, y_rot, z_rot, center):
+        # Degrees to radians
+        x_rot = x_rot / 180.0 * np.pi
+        y_rot = y_rot / 180.0 * np.pi
+        z_rot = z_rot / 180.0 * np.pi
+        # Pre-calculate cosines and sines
+        cos_x, sin_x = np.cos(x_rot), np.sin(x_rot)
+        cos_y, sin_y = np.cos(y_rot), np.sin(y_rot)
+        cos_z, sin_z = np.cos(z_rot), np.sin(z_rot)
+        # Build rotation matrix
+        a11 = cos_y * cos_z
+        a12 = cos_x * sin_z + sin_x * sin_y * cos_z
+        a13 = sin_x * sin_z - cos_x * sin_y * cos_z
+        a21 = -cos_y * sin_z
+        a22 = cos_x * cos_z - sin_x * sin_y * sin_z
+        a23 = sin_x * cos_z + cos_x * sin_y * sin_z
+        a31 = sin_y
+        a32 = -sin_x * cos_y
+        a33 = cos_x * cos_y
+        # Matrix multiplication
+        return np.dot(np.array([x, y, z]) - center,
+                      [[a11, a12, a13],
+                       [a21, a22, a23],
+                       [a31, a32, a33]]) + center
+
+    def rotate(self, x_rot, y_rot, z_rot, center):
+        for (ix, x), (_, y), (_, z) in zip(np.ndenumerate(self.xx),
+                                           np.ndenumerate(self.yy),
+                                           np.ndenumerate(self.zz)):
+            self.xx[ix], self.yy[ix], self.zz[ix] = self._rotate_point(
+                x, y, z, x_rot, y_rot, z_rot, center)
+
 
 def create_figure():
     background_color = '#131919'
@@ -50,6 +82,18 @@ def create_figure():
     ax.patch.set_facecolor(background_color)
     ax.axis('off')
     return fig, ax
+
+
+def disable_perspective():
+    # Source: http://tinyurl.com/jthka7l
+    def orthogonal_proj(zfront, zback):
+        a = (zfront + zback) / (zfront - zback)
+        b = -2 * (zfront * zback) / (zfront - zback)
+        return np.array([[1, 0, 0, 0],
+                         [0, 1, 0, 0],
+                         [0, 0, a, b],
+                         [0, 0, -0.0001, zback]])
+    proj3d.persp_transformation = orthogonal_proj
 
 
 def run_animation():
@@ -74,8 +118,17 @@ def run_animation():
                     Plane(point=[max_val, center, center],  # yz-plane 2
                           normal=[1, 0, 0])]
 
+    drawn_squares = []
     fig, ax = create_figure()
-    for square_face, c in zip(square_faces, ['r', 'g', 'b', 'c', 'm', 'y']):
-        square_face.calculate_coords(min_val, max_val)
-        ax.plot_surface(square_face.xx, square_face.yy, square_face.zz,
-                        color=c, alpha=0.7)
+    # disable_perspective()
+    # ax.view_init(elev=35.3, azim=45)
+    for i in np.arange(1, 360, 40):
+        # if drawn_squares:
+        #     [square.remove() for square in drawn_squares]
+        #     drawn_squares = []
+        for face, c in zip(square_faces, ['r', 'g', 'b', 'c', 'm', 'y']):
+            if i == 1:
+                face.calculate_coords(min_val, max_val)
+            face.rotate(i, i, i, center=center)
+            drawn_squares.append(
+                ax.plot_surface(face.xx, face.yy, face.zz, color=c, alpha=0.7))
