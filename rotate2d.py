@@ -21,8 +21,9 @@ def rotate_point(x, y, center_point, angle_deg):
     # https://en.wikipedia.org/wiki/Rotation_matrix
     angle_radians = angle_deg / 180.0 * np.pi
     sine, cosine = np.sin(angle_radians), np.cos(angle_radians)
-    new_x = (x-center_point) * cosine - (y-center_point) * sine + center_point
-    new_y = (x-center_point) * sine + (y-center_point) * cosine + center_point
+    new_x, new_y = np.dot(np.array([x, y]) - center_point,
+                          [[cosine, sine],
+                           [-sine, cosine]]) + center_point
     return new_x, new_y
 
 
@@ -68,13 +69,18 @@ def draw_projections(ax, x, y, a, b, c):
     return drawn_points
 
 
-def run_animation(ims_output_folder):
+def run_animation():
 
     # Settings
     n_data_points = 20
     min_val, max_val = 20, 80
     val_range = max_val - min_val
     np.random.seed(123)
+
+    # Create output directory
+    gif_frames_output_folder = 'gif_frames_rotating_projections_2d'
+    if not os.path.exists(gif_frames_output_folder):
+        os.makedirs(gif_frames_output_folder)
 
     # Create data points
     x = np.random.randint(low=min_val, high=max_val, size=n_data_points)
@@ -112,6 +118,8 @@ def run_animation(ims_output_folder):
                         zorder=999)
         drawn_shapes.append(line)
 
-        file_name = os.path.join(ims_output_folder,
+        file_name = os.path.join(gif_frames_output_folder,
                                  'frame_%s.png' % str(frame).zfill(max_digits))
         plt.savefig(file_name, format='png', facecolor=fig.get_facecolor())
+
+    return gif_frames_output_folder

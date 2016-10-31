@@ -4,6 +4,7 @@ import subprocess
 from sys import platform as _platform
 
 import rotate2d
+import rotate3d
 
 
 def get_imagemagick_path():
@@ -30,11 +31,11 @@ def create_gif(ims_input_folder, gif_output_name, delay=2):
 
 if __name__ == '__main__':
 
-    # Create output folder
-    gif_frames_output_folder = 'gif_frames_2d'
-    if not os.path.exists(gif_frames_output_folder):
-        os.makedirs(gif_frames_output_folder)
-
-    rotate2d.run_animation(ims_output_folder=gif_frames_output_folder)
-    create_gif(ims_input_folder=gif_frames_output_folder,
+    frames_folder = rotate2d.run_animation()
+    create_gif(ims_input_folder=frames_folder,
                gif_output_name='rotating_projections_2d.gif', delay=3)
+
+    frames_folder = rotate3d.run_animation(
+        coloring=rotate3d.Coloring.plane_specific)
+    create_gif(ims_input_folder=frames_folder,
+               gif_output_name='rotating_cubes_3d.gif', delay=3)
