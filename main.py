@@ -3,8 +3,8 @@ import os
 import subprocess
 from sys import platform as _platform
 
-import rotate2d
-import rotate3d
+import rotating_projections
+import rotating_cubes
 
 
 def get_imagemagick_path():
@@ -22,6 +22,7 @@ def get_imagemagick_path():
 
 def create_gif(ims_input_folder, gif_output_name, delay=2):
     # Create GIF with ImageMagick
+    print "Creating gif..."
     subprocess.call(
         "{path_to_convert} -delay {delay} "
         "{ims_folder}/*png {gif_name}".format(
@@ -31,11 +32,10 @@ def create_gif(ims_input_folder, gif_output_name, delay=2):
 
 if __name__ == '__main__':
 
-    frames_folder = rotate2d.run_animation()
+    frames_folder = rotating_projections.run_animation()
     create_gif(ims_input_folder=frames_folder,
-               gif_output_name='rotating_projections_2d.gif', delay=3)
+               gif_output_name='rotating_projections.gif', delay=3)
 
-    frames_folder = rotate3d.run_animation(
-        coloring=rotate3d.Coloring.plane_specific)
+    frames_folder = rotating_cubes.run_animation()
     create_gif(ims_input_folder=frames_folder,
-               gif_output_name='rotating_cubes_3d.gif', delay=3)
+               gif_output_name='rotating_cubes.gif', delay=3)
