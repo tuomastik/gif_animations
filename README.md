@@ -5,7 +5,7 @@ GIF animations created in Python
 
 ![](rotating_projections.gif)
 
-##Dependencies
+## Dependencies
 
 * [NumPy](http://www.numpy.org/) (numerical operations)
 * [matplotlib](http://matplotlib.org/) (graphical representation)
