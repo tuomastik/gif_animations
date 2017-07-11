@@ -1,5 +1,8 @@
 # gif_animations
+
 GIF animations created in Python
+
+![](rotating_mountain.gif)
 
 ![](rotating_cubes.gif)
 

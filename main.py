@@ -5,6 +5,7 @@ from sys import platform as _platform
 
 import rotating_projections
 import rotating_cubes
+import rotating_mountain
 
 
 def get_imagemagick_path():
@@ -22,7 +23,7 @@ def get_imagemagick_path():
 
 def create_gif(ims_input_folder, gif_output_name, delay=2):
     # Create GIF with ImageMagick
-    print "Creating gif..."
+    print("Creating gif...")
     subprocess.call(
         "{path_to_convert} -delay {delay} "
         "{ims_folder}/*png {gif_name}".format(
@@ -31,11 +32,14 @@ def create_gif(ims_input_folder, gif_output_name, delay=2):
 
 
 if __name__ == '__main__':
-
-    frames_folder = rotating_projections.run_animation()
+    frames_folder = rotating_projections.create_animation_frames()
     create_gif(ims_input_folder=frames_folder,
                gif_output_name='rotating_projections.gif', delay=3)
 
-    frames_folder = rotating_cubes.run_animation()
+    frames_folder = rotating_cubes.create_animation_frames()
     create_gif(ims_input_folder=frames_folder,
                gif_output_name='rotating_cubes.gif', delay=3)
+
+    frames_folder = rotating_mountain.create_animation_frames()
+    create_gif(ims_input_folder=frames_folder,
+               gif_output_name='rotating_mountain.gif', delay=4)

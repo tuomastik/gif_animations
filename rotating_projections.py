@@ -70,11 +70,10 @@ def draw_projections(ax, x, y, a, b, c):
 
 
 def print_progress(current, total):
-    print "Rotating projections: creating frame %s / %s..." % (current, total)
+    print("Rotating projections: creating frame %s / %s..." % (current, total))
 
 
-def run_animation():
-
+def create_animation_frames():
     # Settings
     n_data_points = 20
     min_val, max_val = 20, 80

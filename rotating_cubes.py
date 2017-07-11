@@ -232,11 +232,10 @@ def ease_in_quad(t, b, c, d):
 
 
 def print_progress(current, total):
-    print "Rotating cubes: creating frame %s / %s..." % (current, total)
+    print("Rotating cubes: creating frame %s / %s..." % (current, total))
 
 
-def run_animation():
-
+def create_animation_frames():
     # Settings
     big_cube_min, big_cube_max = 20, 80  # For x, y, z
     center = big_cube_min + (big_cube_max - big_cube_min) / 2.0
