@@ -2,6 +2,8 @@
 
 GIF animations created in Python
 
+![](rotating_kde.gif)
+
 ![](rotating_mountain.gif)
 
 ![](rotating_cubes.gif)
@@ -12,4 +14,5 @@ GIF animations created in Python
 
 * [NumPy](http://www.numpy.org/) (numerical operations)
 * [matplotlib](http://matplotlib.org/) (graphical representation)
-* [ImageMagick](http://www.imagemagick.org/) (GIF creation)
+* [seaborn](https://seaborn.pydata.org/) (statistical data visualization)
+* [ImageMagick](http://www.imagemagick.org/) (image processing, GIF creation)
