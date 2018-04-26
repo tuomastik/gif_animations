@@ -2,13 +2,10 @@
 
 GIF animations created in Python
 
-![](rotating_kde.gif)
+| ![](rotating_kde.gif) | ![](rotating_mountain.gif) |
+|-|-|
+| ![](rotating_cubes.gif) | ![](rotating_projections.gif) |
 
-![](rotating_mountain.gif)
-
-![](rotating_cubes.gif)
-
-![](rotating_projections.gif)
 
 ## Dependencies
 
