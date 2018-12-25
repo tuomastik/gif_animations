@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import colors
 from matplotlib import cm
+from tqdm import tqdm
 
 
 def create_figure(min_val, max_val):
@@ -69,10 +70,6 @@ def draw_projections(ax, x, y, a, b, c):
     return drawn_points
 
 
-def print_progress(current, total):
-    print("Rotating projections: creating frame %s / %s..." % (current, total))
-
-
 def create_animation_frames():
     # Settings
     n_data_points = 20
@@ -81,7 +78,7 @@ def create_animation_frames():
     np.random.seed(123)
 
     # Create output directory
-    gif_frames_output_folder = 'gif_frames_rotating_projections'
+    gif_frames_output_folder = 'gif_frames_projections'
     if not os.path.exists(gif_frames_output_folder):
         os.makedirs(gif_frames_output_folder)
 
@@ -101,8 +98,8 @@ def create_animation_frames():
     drawn_shapes = []
     max_degrees = 180
     max_digits = len(str(max_degrees))
-    for frame in range(max_degrees):
-        print_progress(frame+1, max_degrees)
+    print("Creating frames of the projections GIF...")
+    for frame in tqdm(range(max_degrees)):
 
         # Rotate points
         x0, y0 = rotate_point(x=x0, y=y0, center_point=center, angle_deg=1)

@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot as plt
 from matplotlib import font_manager as fm
 from tqdm import tqdm
@@ -143,6 +142,7 @@ def create_animation_frames():
     draw_ribbon(ax, figsize)
     draw_text(ax, figsize)
 
+    print("Creating frames of the christmas GIF...")
     total_frames = 360
     for frame in tqdm(range(total_frames)):
 

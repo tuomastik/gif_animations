@@ -36,7 +36,7 @@ def convert_images_format(ims_folder, format_from="svg", format_to="png",
 
 def create_gif(ims_input_folder, gif_output_name, delay=2, ext="png"):
     # Create GIF with ImageMagick
-    print("Creating GIF...")
+    print("Stitching together a GIF from the frames of directory: %s..." % ims_input_folder)
     subprocess.call(
         "{path_to_convert} -delay {delay} "
         "{ims_folder}/*{ext} {gif_name}".format(

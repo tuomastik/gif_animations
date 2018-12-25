@@ -1,9 +1,10 @@
 import os
 
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D, proj3d, art3d
+from mpl_toolkits.mplot3d import proj3d, art3d
 from matplotlib import pyplot as plt
 from matplotlib import colors
+from tqdm import tqdm
 
 
 class Plane:
@@ -231,10 +232,6 @@ def ease_in_quad(t, b, c, d):
     return c*t*t + b
 
 
-def print_progress(current, total):
-    print("Rotating cubes: creating frame %s / %s..." % (current, total))
-
-
 def create_animation_frames():
     # Settings
     big_cube_min, big_cube_max = 20, 80  # For x, y, z
@@ -244,7 +241,7 @@ def create_animation_frames():
     elev, azim = 35.3, 45  # Initial camera position
 
     # Create output directory
-    gif_frames_output_folder = 'gif_frames_rotating_cubes'
+    gif_frames_output_folder = 'gif_frames_cubes'
     if not os.path.exists(gif_frames_output_folder):
         os.makedirs(gif_frames_output_folder)
 
@@ -259,11 +256,12 @@ def create_animation_frames():
     # Initialize color normalizer
     norm_small = colors.Normalize(vmin=small_cube_min, vmax=small_cube_max)
 
+    print("Creating frames of the cubes GIF...")
+
     # Rotate cubes standing on their corners
     max_frames_rot1 = 61
     max_frames_rot2 = 254
-    for frame in range(max_frames_rot1):
-        print_progress(frame+1, max_frames_rot1+max_frames_rot2)
+    for frame in tqdm(range(max_frames_rot1)):
         drawn_shapes = []
         for face_big, face_small in zip(big_cube, small_cube):
             if frame > 0:
@@ -278,9 +276,7 @@ def create_animation_frames():
 
     # Rotate small cube around x and z axis
     frames_accelerate = 70
-    for frame in np.arange(1, max_frames_rot2, 1):
-        print_progress(max_frames_rot1+frame+1,
-                       max_frames_rot1+max_frames_rot2)
+    for frame in tqdm(np.arange(1, max_frames_rot2, 1)):
         drawn_shapes = []
         for face_big, face_small in zip(big_cube, small_cube):
             drawn_shapes += draw_cubes(ax, face_big, face_small, norm_small)

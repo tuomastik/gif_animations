@@ -3,7 +3,8 @@ import os
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D, art3d
+from mpl_toolkits.mplot3d import art3d
+from tqdm import tqdm
 
 
 def create_animation_frames():
@@ -11,7 +12,7 @@ def create_animation_frames():
     elev, azim, dist = 90, 80, 10  # Initial camera position
 
     # Create output directory
-    gif_frames_output_folder = 'gif_frames_rotating_kde'
+    gif_frames_output_folder = 'gif_frames_kde'
     if not os.path.exists(gif_frames_output_folder):
         os.makedirs(gif_frames_output_folder)
 
@@ -25,8 +26,8 @@ def create_animation_frames():
     frames_elev_steady = (frames_tot - 2*frames_elev_change) / 2
     assert(frames_tot == 2*frames_elev_steady + 2*frames_elev_change)
 
-    for i in range(1, frames_tot, 1):
-        print("Rotating kde: creating frame %s / %s..." % (i, frames_tot))
+    print("Creating frames of the KDE GIF...")
+    for i in tqdm(range(1, frames_tot, 1)):
 
         if i < frames_elev_steady:
             small_random_number = np.random.randn(1)[0]*0.005
@@ -56,7 +57,7 @@ def create_animation_frames():
         brightest_color = colors[np.argmax([np.sum(c) for c in colors])]
         ax.patch.set_facecolor(brightest_color)
         f.set_facecolor(brightest_color)
-        plt.show()
+        # plt.show()
         plt.draw()
         file_name = os.path.join(gif_frames_output_folder,
                                  "frame_%s.png" % str(i).zfill(4))

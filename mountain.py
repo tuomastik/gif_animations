@@ -17,7 +17,7 @@ def create_animation_frames():
     elev, azim = 30, 80  # Initial camera position
 
     # Create output directory
-    gif_frames_output_folder = 'gif_frames_rotating_mountain'
+    gif_frames_output_folder = 'gif_frames_mountain'
     if not os.path.exists(gif_frames_output_folder):
         os.makedirs(gif_frames_output_folder)
 
@@ -54,7 +54,7 @@ def create_animation_frames():
                  y_interp.max() - 0.8 * y_interp.std()))
 
     # Create frames for the animation
-    print("Creating frames for mountain GIF...")
+    print("Creating frames of the mountain GIF...")
     frames_total = 230
     for frame in tqdm(range(frames_total)):
         # Rotate camera 360 degrees during the loop
