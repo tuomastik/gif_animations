@@ -2,10 +2,10 @@ import os
 import subprocess
 from sys import platform as _platform
 
-import rotating_projections
-import rotating_cubes
-import rotating_mountain
-import rotating_kde
+import projections
+import cubes
+import mountain
+import kde
 import christmas
 
 
@@ -45,23 +45,23 @@ def create_gif(ims_input_folder, gif_output_name, delay=2, ext="png"):
 
 
 if __name__ == '__main__':
-    frames_folder = rotating_projections.create_animation_frames()
+    frames_folder = projections.create_animation_frames()
     create_gif(ims_input_folder=frames_folder,
-               gif_output_name='rotating_projections.gif', delay=3)
+               gif_output_name='projections.gif', delay=3)
 
-    frames_folder = rotating_cubes.create_animation_frames()
+    frames_folder = cubes.create_animation_frames()
     create_gif(ims_input_folder=frames_folder,
-               gif_output_name='rotating_cubes.gif', delay=3)
+               gif_output_name='cubes.gif', delay=3)
 
-    frames_folder = rotating_mountain.create_animation_frames()
+    frames_folder = mountain.create_animation_frames()
     create_gif(ims_input_folder=frames_folder,
-               gif_output_name='rotating_mountain.gif', delay=4)
+               gif_output_name='mountain.gif', delay=4)
 
-    frames_folder = rotating_kde.create_animation_frames()
+    frames_folder = kde.create_animation_frames()
     convert_images_format(frames_folder, format_from="png", format_to="png",
                           resolution="500x500", create_new_ims=False)
     create_gif(ims_input_folder=frames_folder,
-               gif_output_name='rotating_kde.gif', delay=4)
+               gif_output_name='kde.gif', delay=4)
 
     frames_folder = christmas.create_animation_frames()
     create_gif(ims_input_folder=frames_folder,

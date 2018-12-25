@@ -28,7 +28,7 @@ def create_animation_frames():
     ax.patch.set_facecolor(bg_color)
 
     # Open elevation map
-    z = Image.open('rotating_mountain_elevation_map.jpg').convert('L')
+    z = Image.open('mountain_elevation_map.jpg').convert('L')
 
     # Interpolation (this is only needed if you want the surface to be plotted
     #                to have different dimensions as the elevation map image)
