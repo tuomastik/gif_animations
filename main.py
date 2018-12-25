@@ -1,5 +1,4 @@
 import os
-
 import subprocess
 from sys import platform as _platform
 
@@ -7,6 +6,7 @@ import rotating_projections
 import rotating_cubes
 import rotating_mountain
 import rotating_kde
+import christmas
 
 
 def get_imagemagick_path(binary="convert"):
@@ -16,7 +16,7 @@ def get_imagemagick_path(binary="convert"):
         return os.path.join(os.path.sep, "opt", "local", "bin", binary)
     elif _platform == "win32":  # Windows
         return '"' + os.path.join('c:', os.path.sep, 'Program Files',
-                                  'ImageMagick-7.0.3-Q16', binary+".exe") + '"'
+                                  'ImageMagick-7.0.8-Q16', binary+".exe") + '"'
 
 
 def convert_images_format(ims_folder, format_from="svg", format_to="png",
@@ -62,3 +62,7 @@ if __name__ == '__main__':
                           resolution="500x500", create_new_ims=False)
     create_gif(ims_input_folder=frames_folder,
                gif_output_name='rotating_kde.gif', delay=4)
+
+    frames_folder = christmas.create_animation_frames()
+    create_gif(ims_input_folder=frames_folder,
+               gif_output_name='christmas.gif', delay=2)
