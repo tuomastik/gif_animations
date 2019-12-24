@@ -1,10 +1,12 @@
 import os
 
 import numpy as np
-from mpl_toolkits.mplot3d import proj3d, art3d
+from mpl_toolkits.mplot3d import art3d
 from matplotlib import pyplot as plt
 from matplotlib import colors
 from tqdm import tqdm
+
+from utils import create_3d_figure
 
 
 class Plane:
@@ -139,33 +141,6 @@ def get_cube(min_val, max_val, center, grid_size):
     return square_faces
 
 
-def disable_perspective():
-    # Source: http://tinyurl.com/jthka7l
-    def orthogonal_proj(zfront, zback):
-        a = (zfront + zback) / (zfront - zback)
-        b = -2 * (zfront * zback) / (zfront - zback)
-        return np.array([[1, 0, 0, 0],
-                         [0, 1, 0, 0],
-                         [0, 0, a, b],
-                         [0, 0, -0.0001, zback]])
-    proj3d.persp_transformation = orthogonal_proj
-
-
-def create_figure(min_val, max_val, elev, azim):
-    fig = plt.figure(figsize=(5, 5), facecolor='#131919',
-                     frameon=False)
-    ax = fig.add_subplot(111, projection='3d')
-    ax.patch.set_facecolor('#131919')
-    ax.set_xlim((min_val, max_val))
-    ax.set_ylim((min_val, max_val))
-    ax.set_zlim((min_val, max_val))
-    ax.axis('off')
-    ax.view_init(elev=elev, azim=azim)
-    disable_perspective()
-    plt.tight_layout()
-    return fig, ax
-
-
 def colomapped_wireframe(plane, ax, stride, norm, colormap='hsv'):
     # Source: http://stackoverflow.com/a/24958192/5524090
     wire = ax.plot_wireframe(
@@ -232,7 +207,7 @@ def ease_in_quad(t, b, c, d):
     return c*t*t + b
 
 
-def create_animation_frames():
+def create_animation_frames(gif_frames_output_folder: str) -> None:
     # Settings
     big_cube_min, big_cube_max = 20, 80  # For x, y, z
     center = big_cube_min + (big_cube_max - big_cube_min) / 2.0
@@ -240,18 +215,21 @@ def create_animation_frames():
                                       big_cube_max - (center-big_cube_min)*0.5)
     elev, azim = 35.3, 45  # Initial camera position
 
-    # Create output directory
-    gif_frames_output_folder = 'gif_frames_cubes'
-    if not os.path.exists(gif_frames_output_folder):
-        os.makedirs(gif_frames_output_folder)
-
     # Initialize cubes
     big_cube = get_cube(big_cube_min, big_cube_max, center, grid_size=2.0)
     small_cube = get_cube(small_cube_min, small_cube_max, center,
                           grid_size=50.0)
 
     # Initialize figure
-    fig, ax = create_figure(big_cube_min, big_cube_max, elev, azim)
+    fig, ax = create_3d_figure(figsize=(5, 5),
+                               xlim=(big_cube_min, big_cube_max),
+                               ylim=(big_cube_min, big_cube_max),
+                               zlim=(big_cube_min, big_cube_max),
+                               background_color="#131919",
+                               elev=elev,
+                               azim=azim,
+                               # Disable perspective
+                               proj_type="ortho")
 
     # Initialize color normalizer
     norm_small = colors.Normalize(vmin=small_cube_min, vmax=small_cube_max)
@@ -310,5 +288,3 @@ def create_animation_frames():
         save_image(fig, gif_frames_output_folder, max_frames_rot1 + frame, 3)
         # Remove last drawn shapes
         [shape.remove() for shape in drawn_shapes]
-
-    return gif_frames_output_folder

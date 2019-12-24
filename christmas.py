@@ -6,18 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib import font_manager as fm
 from tqdm import tqdm
 
-
-def create_figure(figsize, elev, azim):
-    fig = plt.figure(figsize=figsize, facecolor='#131919', frameon=False)
-    ax = fig.add_subplot(111, projection='3d')
-    ax.patch.set_facecolor('#131919')
-    ax.axis('off')
-    ax.view_init(elev=elev, azim=azim)
-    ax.set_xlim(-2, 2)
-    ax.set_ylim(-2, 2)
-    ax.set_zlim(-7, 31)
-    plt.tight_layout()
-    return fig, ax
+from utils import create_3d_figure
 
 
 def draw_tree(ax):
@@ -127,15 +116,17 @@ def draw_text(ax, figsize):
                                                size=figsize[0] / 5 * 13))
 
 
-def create_animation_frames():
-    gif_frames_output_folder = 'gif_frames_christmas'
-    if not os.path.exists(gif_frames_output_folder):
-        os.makedirs(gif_frames_output_folder)
-
+def create_animation_frames(gif_frames_output_folder: str) -> None:
     figsize = (5, 5)
     assert(figsize[0] == figsize[1])
     elev, azim = 24, 25
-    fig, ax = create_figure(figsize, elev, azim)
+    fig, ax = create_3d_figure(figsize=figsize,
+                               background_color="#131919",
+                               xlim=(-2, 2),
+                               ylim=(-2, 2),
+                               zlim=(-7, 31),
+                               elev=elev,
+                               azim=azim)
 
     draw_tree(ax)
     draw_top_light(ax)
@@ -153,5 +144,3 @@ def create_animation_frames():
         # Save
         file_name = os.path.join(gif_frames_output_folder, 'frame_%s.png' % str(frame).zfill(3))
         plt.savefig(file_name, facecolor=fig.get_facecolor())
-
-    return gif_frames_output_folder

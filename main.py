@@ -1,6 +1,6 @@
 import os
 import subprocess
-from pprint import pprint
+from pprint import pformat
 from sys import platform as _platform
 
 import projections
@@ -37,27 +37,29 @@ def convert_images_format(ims_folder, format_from="svg", format_to="png",
 
 def create_gif(ims_input_folder, gif_output_name, delay=2, ext="png"):
     # Create GIF with ImageMagick
-    print(f"Stitching together a GIF from the frames "
-          "in the directory: {ims_input_folder}...")
+    print("Stitching together a GIF from the frames "
+          f"in the directory: {ims_input_folder}...")
     subprocess.call(
         "{path_to_convert} -delay {delay} "
         "{ims_folder}/*{ext} {gif_name}".format(
             path_to_convert=get_imagemagick_path(), delay=delay, ext=ext,
             ims_folder=ims_input_folder, gif_name=gif_output_name), shell=True)
-    print(f"The following GIF was created successfully: {gif_output_name}")
+    print(f"{gif_output_name} was created successfully")
 
 
 if __name__ == '__main__':
     gifs = {module.__name__: module for module
             in [projections, cubes, mountain, kde, christmas]}
 
-    print("Which GIF do you want to create?")
-    pprint({i: g for i, g in enumerate(gifs.keys())})
-    gif_id = int(input("Give the number of the GIF: "))
+    gif_id = int(input("Which GIF do you want to create?\n%s\n" %
+                       pformat({i: g for i, g in enumerate(gifs.keys())})))
     gif_module = gifs[list(gifs.keys())[gif_id]]
     gif_name = gif_module.__name__
 
-    frames_folder = gif_module.create_animation_frames()
+    frames_folder = "gif_frames_" + gif_name
+    if not os.path.exists(frames_folder):
+        os.makedirs(frames_folder)
+    gif_module.create_animation_frames(frames_folder)
 
     if gif_name == kde.__name__:
         convert_images_format(frames_folder, format_from="png", format_to="png",

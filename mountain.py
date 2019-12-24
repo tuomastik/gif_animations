@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 from PIL import Image
 from tqdm import tqdm
 
+from utils import create_3d_figure
+
 
 def save_image(output_folder, frame, max_frame_digits, bg_color):
     file_name = os.path.join(output_folder, 'frame_%s.png' %
@@ -12,20 +14,16 @@ def save_image(output_folder, frame, max_frame_digits, bg_color):
     plt.savefig(file_name, format='png', facecolor=bg_color)
 
 
-def create_animation_frames():
+def create_animation_frames(gif_frames_output_folder: str) -> None:
     # Settings
     elev, azim = 30, 80  # Initial camera position
 
-    # Create output directory
-    gif_frames_output_folder = 'gif_frames_mountain'
-    if not os.path.exists(gif_frames_output_folder):
-        os.makedirs(gif_frames_output_folder)
-
     # Initialize figure
-    bg_color = '#000000'
-    ax = plt.figure(figsize=(5, 5), facecolor=bg_color,
-                    frameon=False).add_subplot(111, projection='3d')
-    ax.patch.set_facecolor(bg_color)
+    bg_color = "#000000"
+    fig, ax = create_3d_figure(figsize=(5, 5),
+                               background_color=bg_color,
+                               xlim=None, ylim=None, zlim=None,
+                               elev=None, azim=None)
 
     # Open elevation map
     z = Image.open('mountain_elevation_map.jpg').convert('L')
@@ -43,7 +41,6 @@ def create_animation_frames():
                            vmin=z_interp.min(), vmax=z_interp.max())
     surf.set_edgecolors(surf.to_rgba(surf._A))
     surf.set_facecolors((0, 0, 0, 0))
-    ax.axis('off')
 
     # Position the surface nicely in the center of the figure
     ax.set_zlim((z_interp.min() - 4 * z_interp.std(),
@@ -60,5 +57,3 @@ def create_animation_frames():
         # Rotate camera 360 degrees during the loop
         ax.view_init(elev=elev, azim=azim + (frame / frames_total * 360))
         save_image(gif_frames_output_folder, frame, 3, bg_color)
-
-    return gif_frames_output_folder

@@ -6,26 +6,7 @@ from matplotlib import colors
 from matplotlib import cm
 from tqdm import tqdm
 
-
-def create_figure(min_val, max_val):
-    background_color = '#131919'
-    fig = plt.figure(figsize=(5, 5), facecolor=background_color)
-    ax = fig.add_axes([0, 0, 1, 1], frameon=False)
-    ax.axis('off')
-    ax.set_xlim((min_val, max_val))
-    ax.set_ylim((min_val, max_val))
-    return fig, ax
-
-
-def rotate_point(x, y, center_point, angle_deg):
-    # Rotate point (x, y) around center_point
-    # https://en.wikipedia.org/wiki/Rotation_matrix
-    angle_radians = angle_deg / 180.0 * np.pi
-    sine, cosine = np.sin(angle_radians), np.cos(angle_radians)
-    new_x, new_y = np.dot(np.array([x, y]) - center_point,
-                          [[cosine, sine],
-                           [-sine, cosine]]) + center_point
-    return new_x, new_y
+from utils import rotate_point, create_2d_figure
 
 
 def get_line_equation(x0, y0, x1, y1):
@@ -70,17 +51,12 @@ def draw_projections(ax, x, y, a, b, c):
     return drawn_points
 
 
-def create_animation_frames():
+def create_animation_frames(gif_frames_output_folder: str) -> None:
     # Settings
     n_data_points = 20
     min_val, max_val = 20, 80
     val_range = max_val - min_val
     np.random.seed(123)
-
-    # Create output directory
-    gif_frames_output_folder = 'gif_frames_projections'
-    if not os.path.exists(gif_frames_output_folder):
-        os.makedirs(gif_frames_output_folder)
 
     # Create data points
     x = np.random.randint(low=min_val, high=max_val, size=n_data_points)
@@ -92,8 +68,8 @@ def create_animation_frames():
     x1, y1 = [max_val + extra_length * val_range] * 2
     center = min_val + np.round((max_val - min_val) / 2.0)
 
-    # Create figure
-    fig, ax = create_figure(min_val=x0, max_val=x1)
+    fig, ax = create_2d_figure(figsize=(5, 5), background_color="#131919",
+                               xlim=(x0, x1), ylim=(x0, x1))
 
     drawn_shapes = []
     max_degrees = 180
@@ -102,8 +78,8 @@ def create_animation_frames():
     for frame in tqdm(range(max_degrees)):
 
         # Rotate points
-        x0, y0 = rotate_point(x=x0, y=y0, center_point=center, angle_deg=1)
-        x1, y1 = rotate_point(x=x1, y=y1, center_point=center, angle_deg=1)
+        x0, y0 = rotate_point(x=x0, y=y0, center_x=center, center_y=center, angle_deg=1)
+        x1, y1 = rotate_point(x=x1, y=y1, center_x=center, center_y=center, angle_deg=1)
 
         # Remove last drawn shapes
         [shape.remove() for shape in drawn_shapes]
@@ -120,5 +96,3 @@ def create_animation_frames():
         file_name = os.path.join(gif_frames_output_folder,
                                  'frame_%s.png' % str(frame).zfill(max_digits))
         plt.savefig(file_name, format='png', facecolor=fig.get_facecolor())
-
-    return gif_frames_output_folder

@@ -6,15 +6,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import art3d
 from tqdm import tqdm
 
+from utils import create_3d_figure
 
-def create_animation_frames():
+
+def create_animation_frames(gif_frames_output_folder: str) -> None:
     rs = np.random.RandomState(1)
     elev, azim, dist = 90, 80, 10  # Initial camera position
-
-    # Create output directory
-    gif_frames_output_folder = 'gif_frames_kde'
-    if not os.path.exists(gif_frames_output_folder):
-        os.makedirs(gif_frames_output_folder)
 
     # Generate random bivariate dataset
     x, y = rs.randn(2, 50)
@@ -41,13 +38,14 @@ def create_animation_frames():
             elev += 1
             dist += 0.015
 
-        f = plt.figure(figsize=(5, 5), frameon=False)
-        ax = f.add_axes([0, 0, 1, 1], projection="3d")
-        ax.axis('off')
-        ax.set(xlim=(-2.8, 1.6), ylim=(-1.6, 1.6))
-        ax.elev = elev
-        ax.dist = dist
-        ax.azim = azim + (i / frames_tot * 2*360)
+        f, ax = create_3d_figure(figsize=(5, 5),
+                                 xlim=(-2.8, 1.6),
+                                 ylim=(-1.6, 1.6),
+                                 zlim=None,
+                                 background_color="#131919",
+                                 elev=elev,
+                                 azim=azim + (i / frames_tot * 2*360),
+                                 dist=dist)
 
         # For fast rendering, keep gridsize small
         cm = sns.cubehelix_palette(start=i/frames_tot*3, light=1, as_cmap=True)
@@ -66,5 +64,3 @@ def create_animation_frames():
 
         if i == frames_tot - 2:
             x, y = x_orig, y_orig
-
-    return gif_frames_output_folder
