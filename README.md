@@ -2,10 +2,10 @@
 
 GIF animations created in Python
 
-| ![](christmas.gif) | ![](kde.gif) |
+| ![](snowflake.gif) | ![](christmas.gif) |
 |-|-|
-| ![](mountain.gif) | ![](cubes.gif) |
-| ![](projections.gif) | |
+| ![](kde.gif) | ![](mountain.gif) |
+| ![](cubes.gif) | ![](projections.gif) |
 
 
 ## Dependencies

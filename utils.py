@@ -24,6 +24,7 @@ def create_2d_figure(figsize: Tuple[float, float],
                      xlim: Tuple[float, float],
                      ylim: Tuple[float, float]):
     fig = plt.figure(figsize=figsize, facecolor=background_color)
+    # ax = fig.add_axes([0, 0, 1, 1], frameon=False)
     ax = fig.add_axes([0, 0, 1, 1], frameon=False)
     ax.axis('off')
     ax.set_xlim(xlim)

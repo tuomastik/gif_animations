@@ -8,6 +8,7 @@ import cubes
 import mountain
 import kde
 import christmas
+import snowflake
 
 
 def get_imagemagick_path(binary="convert"):
@@ -49,7 +50,7 @@ def create_gif(ims_input_folder, gif_output_name, delay=2, ext="png"):
 
 if __name__ == '__main__':
     gifs = {module.__name__: module for module
-            in [projections, cubes, mountain, kde, christmas]}
+            in [projections, cubes, mountain, kde, christmas, snowflake]}
 
     gif_id = int(input("Which GIF do you want to create?\n%s\n" %
                        pformat({i: g for i, g in enumerate(gifs.keys())})))
@@ -71,6 +72,7 @@ if __name__ == '__main__':
         mountain.__name__: {"delay": 4},
         kde.__name__: {"delay": 4},
         christmas.__name__: {"delay": 2},
+        snowflake.__name__: {"delay": 10},
     }
     create_gif(ims_input_folder=frames_folder,
                gif_output_name=gif_name + ".gif",
