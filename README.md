@@ -25,3 +25,10 @@ GIF animations created in Python
 * Command-line utilities
 
     * [ImageMagick](http://www.imagemagick.org/) - image processing, GIF creation
+
+
+## Usage
+
+```bash
+python main.py
+```
